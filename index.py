@@ -26,9 +26,9 @@
 # pygame.quit()
 
 fire_array = [
-    [0,0,0,1,0],
-    [1,1,1,1,1],
-    [1,0,0,0,1],
+    [1,0,0,0,0],
+    [1,1,0,1,1],
+    [1,0,0,0,0],
     [0,0,1,0,1]
 ]
 
@@ -50,8 +50,6 @@ class FireFocusFinder:
         pass
 
     def find_focuses(self, cur_pos, fire_list):
-        print(self.focus_list)
-        print(self.current_focus)
         if cur_pos[0] == len(fire_list) and cur_pos[1] == 0: #verifica se passou do último elemento
             return self.focus_list
         else:
@@ -66,38 +64,6 @@ class FireFocusFinder:
                 self.focus_list[len(self.focus_list)] = []
                 #self.last_passed_position = [x, y]
 
-                #found_neighbors = 0
-
-                # for i in self.focus_list:
-                #     self.current_focus = i
-                
-                #verifica os vizinhos
-                # if self.focus_list != {}:
-                #     #vizinho de cima
-                #     if x-1 > -1 and fire_list[x-1][y] == 1:
-                #         if (fire_list[x-1][y] in self.focus_list[self.current_focus]) == False:
-                #             self.focus_list[self.current_focus].append([x-1,y])
-                #         found_neighbors += 1
-                #     #vizinho de baixo
-                #     if x+1 < len(fire_list) and fire_list[x+1][y] == 1:
-                #         if (fire_list[x+1][y] in self.focus_list[self.current_focus]) == False:
-                #             self.focus_list[self.current_focus].append([x+1,y])
-                #         found_neighbors += 1
-                #     #vizinho da direita
-                #     if y+1 < len(fire_list[x]) and fire_list[x][y+1] == 1 :
-                #         if (fire_list[x][y+1] in self.focus_list[self.current_focus]) == False:
-                #             self.focus_list[self.current_focus].append([x,y+1])
-                #         found_neighbors += 1
-                #     #vizinho da esquerda
-                #     if y-1 > -1 and fire_list[x][y-1] == 1 :
-                #         if (fire_list[x][y-1] in self.focus_list[self.current_focus]) == False:
-                #             self.focus_list[self.current_focus].append([x,y-1])
-                #         found_neighbors += 1
-
-                #caso não tenha achado nenhum vizinho, cria seu próprio lar
-                # if found_neighbors == 0 and [x,y] not in self.focus_list[self.current_focus]:
-                #     self.focus_list[len(self.focus_list)] = [[x, y]]
-
             #avança a posição de busca
             if y < len(fire_list[x]) - 1:
                 y += 1
@@ -108,7 +74,6 @@ class FireFocusFinder:
             self.find_focuses([x, y], fire_list)
 
     def map_focus(self,cur_pos,fire_list):
-        print(self.focus_list)
         found_neighbors = 0
         x = cur_pos[0]
         y = cur_pos[1]
@@ -156,10 +121,14 @@ class FireFocusFinder:
         fire_map = []
         #substituir fogos do fire_list (fire_array) por número de foco, retornando outra matriz
         for i in range(len(fire_list)):
+            fire_map.append([])
             for j in range(len(fire_list[i])):
-                print(i,j)
-                if self.verificaLista(j):
-                    pass
+                fire_map[i].append(0)
+        for i in range(len(self.focus_list)-1):
+            for j in self.focus_list[i]:
+                fire_map[j[0]][j[1]] = i + 1
+            print(fire_map[i])
+        return fire_map
 
 # ==== Rodando programa =====
 
@@ -170,4 +139,4 @@ fire_focus_finder.find_focuses([0, 0], fire_array)
 print("Focos encontrados: ")
 print(fire_focus_finder.focus_list)
 
-fire_focus_finder.build_focus_map(fire_array)
+print(fire_focus_finder.build_focus_map(fire_array))
