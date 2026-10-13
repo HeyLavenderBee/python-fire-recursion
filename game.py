@@ -1,22 +1,22 @@
-import pygame, sys, random, time
+import pygame, sys, random, time, subprocess
 import pygame_widgets
 from pygame_widgets.button import Button
 
 from index import FireFocusFinder
 from fire_square import FireSquare
 from focus_square import FocusSquare
+from label import Label
+import fire_map_control
 
-# ==============
+# ==============================================
 
 pygame.init()
 pygame.mouse.set_cursor(pygame.cursors.arrow)
 screen = pygame.display.set_mode((1280, 720))
 clock = pygame.time.Clock()
 running = True
-click = False
 
-title_font = pygame.font.SysFont("Arial", 30)
-text_font = pygame.font.SysFont("Arial", 22)
+click = False
 
 is_setting_map = True
 
@@ -33,29 +33,28 @@ fire_matrix = [
 #matriz com os objetos de todos os fogos
 fire_square_list = []
 
+focus_square_list = []
+
+focus_map = []
+
 map_side_size = 5
 
-button_size2 = Button(screen, 500, 20, 60, 40, text="2x2", onClick=lambda: change_map_size(2))
-button_size3 = Button(screen, 580, 20, 60, 40, text="3x3", onClick=lambda: change_map_size(3))
-button_size4 = Button(screen, 660, 20, 60, 40, text="4x4", onClick=lambda: change_map_size(4))
-button_size5 = Button(screen, 740, 20, 60, 40, text="5x5", onClick=lambda: change_map_size(5))
-button_size6 = Button(screen, 820, 20, 60, 40, text="6x6", onClick=lambda: change_map_size(6))
-button_size7 = Button(screen, 900, 20, 60, 40, text="7x7", onClick=lambda: change_map_size(7))
-button_size8 = Button(screen, 980, 20, 60, 40, text="8x8", onClick=lambda: change_map_size(8))
-button_size9 = Button(screen, 1060, 20, 60, 40, text="9x9", onClick=lambda: change_map_size(9))
-button_size10 = Button(screen, 1140, 20, 60, 40, text="10x10", onClick=lambda: change_map_size(10))
+button_size2 = Button(screen, 560, 20, 60, 40, text="2x2", onClick=lambda: change_map_size(2))
+button_size3 = Button(screen, 640, 20, 60, 40, text="3x3", onClick=lambda: change_map_size(3))
+button_size4 = Button(screen, 720, 20, 60, 40, text="4x4", onClick=lambda: change_map_size(4))
+button_size5 = Button(screen, 800, 20, 60, 40, text="5x5", onClick=lambda: change_map_size(5))
+button_size6 = Button(screen, 880, 20, 60, 40, text="6x6", onClick=lambda: change_map_size(6))
+button_size7 = Button(screen, 960, 20, 60, 40, text="7x7", onClick=lambda: change_map_size(7))
+button_size8 = Button(screen, 1040, 20, 60, 40, text="8x8", onClick=lambda: change_map_size(8))
+button_size9 = Button(screen, 1120, 20, 60, 40, text="9x9", onClick=lambda: change_map_size(9))
+button_size10 = Button(screen, 1200, 20, 60, 40, text="10x10", onClick=lambda: change_map_size(10))
 
 clear_button = Button(screen, 30, 120, 130, 40, text="Limpar mapa", onClick=lambda: clear_map())
 calculate_button = Button(screen, 30, 550, 150, 40, text="Calcular Focos", onClick=lambda: make_fire_array())
 
-def draw_title(text, font, color, surface, x, y):
-    textobj = font.render(text, 1, color)
-    textrect = textobj.get_rect()
-    textrect.topleft = (x, y)
-    surface.blit(textobj, textrect)
-
 #limpa todos os fogos desenhados
 def clear_map():
+
     for i in range(len(fire_square_list)):
         for j in range(len(fire_square_list)):
             fire_square_list[i][j].clear()
@@ -63,14 +62,20 @@ def clear_map():
 #função que roda a lógica de calcular focos
 def make_fire_array():
     global fire_matrix
+    global focus_map
     global fire_square_list
 
     fire_focus_finder = FireFocusFinder()
     fire_focus_finder.find_focuses([0,0], fire_matrix)
-    print(fire_focus_finder.focus_list)
-    draw_focus_map(fire_focus_finder.build_focus_map(fire_matrix))
+    focus_list = fire_focus_finder.focus_list
+    # print(fire_focus_finder.focus_list)
 
-focus_square_list = []
+    focus_map = fire_focus_finder.build_focus_map(fire_matrix)
+
+    fire_map_control.map_side_size = 7
+    print(fire_map_control.map_side_size)
+
+    subprocess.run(["py", "./focus_window.py", str(map_side_size), str(focus_map), str(focus_list)])
 
 def draw_focus_map(focus_map):
     x_pos = 480
@@ -211,7 +216,7 @@ def main_menu():
         #ações do teclado e fechamento de janela
         events = pygame.event.get()
         for event in events:
-            if event.type == pygame.QUIT or event.type == pygame.K_ESCAPE:
+            if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
                 pygame.quit()
                 quit()
             if event.type == pygame.MOUSEBUTTONDOWN:
@@ -220,13 +225,15 @@ def main_menu():
 
         mx, my = pygame.mouse.get_pos() #posições do mouse
 
-        draw_title("Identificador de Focos de Incêndio", title_font, (0,0,0), screen, 30, 20)
+        Label("Identificador de Focos de Incêndio", 30, (0,0,0), screen, 30, 20)
 
-        draw_title("Desenhe os quadrados no mapa ao", text_font, (0,0,0), screen, 30, 200)
-        draw_title("lado para que possuam fogo ou não.", text_font, (0,0,0), screen, 30, 230)
-        draw_title("Depois, clique no botão abaixo para", text_font, (0,0,0), screen, 30, 260)
-        draw_title("calcular os focos de incêndio com base", text_font, (0,0,0), screen, 30, 290)
-        draw_title("no mapa desenhado.", text_font, (0,0,0), screen, 30, 320)
+        Label("Desenhe os quadrados no mapa ao", 21, (100,0,30), screen, 30, 200)
+        Label("lado para que possuam fogo ou não.", 21, (100,0,30), screen, 30, 230)
+        Label("Depois, clique no botão abaixo para", 21, (100,0,30), screen, 30, 260)
+        Label("calcular os focos de incêndio com base", 21, (100,0,30), screen, 30, 290)
+        Label("no mapa desenhado.", 21, (100,0,30), screen, 30, 320)
+
+        Label("Feito completamente por humanos :D", 20, "#448AC7", screen, 30, 670)
 
         #chama função para colocar componentes na tela
         set_components(mx, my)
@@ -234,6 +241,6 @@ def main_menu():
         pygame_widgets.update(events)  # Call once every loop to allow widgets to render and listen
         pygame.display.update()
 
-        clock.tick(15) #limita a 30fps
+        clock.tick(15) #limita a 15fps
 
 main_menu()

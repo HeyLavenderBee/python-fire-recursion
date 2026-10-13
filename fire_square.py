@@ -47,7 +47,6 @@ class FireSquare:
         elif self.is_fire == True:
             self.is_fire = False
             self.fire_matrix[self.x_pos][self.y_pos] = 0
-            print(self.fire_matrix)
             self.color = (0,0,0)
             self.build_shape(self.x, self.y, self.width, self.height, self.color)
 

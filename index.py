@@ -83,7 +83,8 @@ class FireFocusFinder:
                     self.map_focus([x,y-1],fire_list)
         
         return True
-    
+
+    #verifica se a cordenada atual é válida no fire_list
     def verify_list(self,valor):
         for i in self.focus_list:
             for j in self.focus_list[i]:

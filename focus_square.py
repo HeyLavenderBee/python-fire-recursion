@@ -1,14 +1,5 @@
 import pygame
-
-pygame.font.init()
-
-focus_font = pygame.font.SysFont("Arial", 25)
-
-def draw_title(text, font, color, surface, x, y):
-    textobj = font.render(text, 1, color)
-    textrect = textobj.get_rect()
-    textrect.topleft = (x, y)
-    surface.blit(textobj, textrect)
+from label import Label
 
 class FocusSquare:
     is_fire = False
@@ -36,7 +27,7 @@ class FocusSquare:
         self.screen = screen
         self.focus_number = focus_number
         self.build_shape(x, y, width, height, color)
-        draw_title(str(focus_number), focus_font, (0,0,0), screen, x+15, y+15)
+        Label(str(focus_number), 25, (0,0,0), screen, x+15, y+15)
 
     def build_shape(self, x, y, width, height, color):
         btn = pygame.Rect(x,y,width,height)
