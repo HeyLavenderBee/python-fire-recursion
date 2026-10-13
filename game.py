@@ -3,6 +3,9 @@ import pygame_widgets
 from pygame_widgets.button import Button
 
 from index import FireFocusFinder
+from fire_square import FireSquare
+
+# ==============
 
 pygame.init()
 pygame.mouse.set_cursor(pygame.cursors.arrow)
@@ -12,36 +15,35 @@ running = True
 click = False
 
 title_font = pygame.font.SysFont("Arial", 30)
-text_font = pygame.font.SysFont("Arial", 20)
+text_font = pygame.font.SysFont("Arial", 22)
 
-#dicionário que possui as cores de todos os quadrados
-map_squares_color = {
-    0: [(0,0,0), (0,0,0), (0,0,0)],
-    1: [(0,0,0), (0,0,0), (0,0,0)],
-    2: [(0,0,0), (0,0,0), (0,0,0)],
-}
+is_setting_map = True
 
 fire_matrix = [
-    [0,0,0],
-    [0,0,0],
-    [0,0,0]
+    [0,0,0,0,0],
+    [0,0,0,0,0],
+    [0,0,0,0,0],
+    [0,0,0,0,0],
+    [0,0,0,0,0]
 ]
 
+#matriz com os objetos de todos os fogos
 fire_square_list = []
 
-map_side_size = 3
-
-fire_sprite = pygame.image.load("img/fire-sprite.png")
+map_side_size = 5
 
 button_size2 = Button(screen, 500, 20, 60, 40, text="2x2", onClick=lambda: change_map_size(2))
 button_size3 = Button(screen, 580, 20, 60, 40, text="3x3", onClick=lambda: change_map_size(3))
 button_size4 = Button(screen, 660, 20, 60, 40, text="4x4", onClick=lambda: change_map_size(4))
 button_size5 = Button(screen, 740, 20, 60, 40, text="5x5", onClick=lambda: change_map_size(5))
-calculate_button = Button(screen, 30, 400, 150, 40, text="Calcular Focos", onClick=lambda: make_fire_array())
+button_size6 = Button(screen, 820, 20, 60, 40, text="6x6", onClick=lambda: change_map_size(6))
+button_size7 = Button(screen, 900, 20, 60, 40, text="7x7", onClick=lambda: change_map_size(7))
+button_size8 = Button(screen, 980, 20, 60, 40, text="8x8", onClick=lambda: change_map_size(8))
+button_size9 = Button(screen, 1060, 20, 60, 40, text="9x9", onClick=lambda: change_map_size(9))
+button_size10 = Button(screen, 1140, 20, 60, 40, text="10x10", onClick=lambda: change_map_size(10))
 
-click = False
-
-is_setting_map = True
+clear_button = Button(screen, 30, 120, 130, 40, text="Limpar mapa", onClick=lambda: clear_map())
+calculate_button = Button(screen, 30, 550, 150, 40, text="Calcular Focos", onClick=lambda: make_fire_array())
 
 def draw_title(text, font, color, surface, x, y):
     textobj = font.render(text, 1, color)
@@ -49,75 +51,27 @@ def draw_title(text, font, color, surface, x, y):
     textrect.topleft = (x, y)
     surface.blit(textobj, textrect)
 
+#limpa todos os fogos desenhados
+def clear_map():
+    for i in range(len(fire_square_list)):
+        for j in range(len(fire_square_list)):
+            fire_square_list[i][j].clear()
+
+#função que roda a lógica de calcular focos
 def make_fire_array():
     global fire_matrix
+
+    print(fire_matrix)
 
     fire_focus_finder = FireFocusFinder()
     fire_focus_finder.find_focuses([0,0], fire_matrix)
     print(fire_focus_finder.focus_list)
     print(fire_focus_finder.build_focus_map(fire_matrix))
 
-class FireSquare:
-    is_fire = False
-    clicked = False
-    collidepoint = 0
-    x = 0
-    y = 0
-    width = 0
-    height = 0
-    color = (0,0,0)
-    hover_color = (90,0,0)
-    x_pos = 0
-    y_pos = 0
-
-    def __init__(self, x, y, width, height, color, x_map_pos, y_map_pos):
-        self.x_pos = x_map_pos
-        self.y_pos = y_map_pos
-        self.x = x
-        self.y = y
-        self.width = width
-        self.height = height
-        self.color = color
-        self.build_shape(x, y, width, height, color)
-
-    def build_shape(self, x, y, width, height, color):
-        btn = pygame.Rect(x,y,width,height)
-        pygame.draw.rect(screen, color, btn)
-        self.collidepoint = btn.collidepoint
-
-    def hover(self):
-        # if self.is_fire:
-        #     self.hover_color = (255,0,0)
-        pygame.mouse.set_cursor(pygame.cursors.ball)
-        # self.build_shape(self.x, self.y, self.width, self.height, self.hover_color)
-        # if self.is_fire:
-        #     screen.blit(fire_sprite, (self.x+10,self.y+10))
-
-    def click(self):
-        if self.is_fire == False:
-            self.is_fire = True
-            fire_matrix[self.x_pos][self.y_pos] = 1
-            self.color = (255,0,0)
-            self.build_shape(self.x, self.y, self.width, self.height, self.color)
-            screen.blit(fire_sprite, (self.x+10,self.y+10))
-        elif self.is_fire == True:
-            self.is_fire = False
-            fire_matrix[self.x_pos][self.y_pos] = 0
-            self.color = (0,0,0)
-            self.build_shape(self.x, self.y, self.width, self.height, self.color)
-
-class CalculateButton:
-    def __init__(self):
-        calculate_btn = pygame.Rect(30,400,120,40)
-        pygame.draw.rect(screen, (200,180,200), calculate_btn)
-        draw_title("Calcular focos", text_font, (0,0,0), screen, 35, 410)
-
 def set_components(mx, my):
     global map_side_size
 
-    set_map(mx,my) 
-
-    # calculate_button = CalculateButton()
+    set_map(mx,my)
 
 def set_map(mx ,my):
     global is_setting_map
@@ -141,7 +95,6 @@ def on_fire_hover(mx,my):
 def change_map_size(new_size):
     global is_setting_map
     global map_side_size
-    global map_squares_color
     global fire_matrix
 
     is_setting_map = True
@@ -161,6 +114,54 @@ def change_map_size(new_size):
         map_squares_color[i] = line_array
         fire_matrix.append(fire_line_array)
 
+#chamado quando o tamanho do mapa é alterado, para redesenhar o mapa
+def set_first_map():
+    global is_setting_map
+    global map_squares_color
+    global fire_square_list
+
+    change_map_size(map_side_size)
+
+    fire_square_list = []
+
+    x_pos = 480
+    y_pos = 95
+    width = 80
+    height = 80
+    pos_increment = 95
+
+    cover_bg = pygame.Rect(400,80,1000,1000) #para cobrir os quadrados desenhados antes
+    pygame.draw.rect(screen, "#E8E0E5", cover_bg)
+
+    if map_side_size > 6:
+        width = 60
+        height = 60
+        pos_increment = 70
+
+    width = 100-(map_side_size*5)
+    height = 100-(map_side_size*5)
+    x_pos = 480+map_side_size*4
+    pos_increment = width+10
+    
+    map_width = (width*map_side_size)+((pos_increment-width)*(map_side_size+3))
+    map_rect = pygame.Rect(560, 80, map_width, map_width)
+    pygame.draw.rect(screen, "#C8B7AB", map_rect)
+
+    for i in range(map_side_size):
+        fire_square_list.append([])
+
+        for j in range(map_side_size):
+            x_pos += pos_increment
+
+            fire_square = FireSquare(x_pos,y_pos,width,height,(0,0,0), i, j, screen, fire_matrix)
+            fire_square_list[i].append(fire_square)
+        
+        x_pos = 480+map_side_size*4
+        y_pos += pos_increment
+    
+    is_setting_map = False
+
+#a base da aplicação pygame, roda a 15fps
 def main_menu():
     global btn1_color
     global click
@@ -199,43 +200,5 @@ def main_menu():
         pygame.display.update()
 
         clock.tick(15) #limita a 30fps
-
-def game():
-    running = True
-    while running:
-        events = pygame.event.get()
-        for event in events:
-            if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
-                running = False
-        
-        pygame.display.update()
-        clock.tick(30) #limita a 30fps
-
-def set_first_map():
-    global is_setting_map
-    global map_squares_color
-    global fire_square_list
-
-    map_rect = pygame.Rect(600,80,520,520)
-    pygame.draw.rect(screen, "#C8B7AB", map_rect)
-
-    fire_square_list = []
-
-    x_pos = 520
-    y_pos = 95
-
-    for i in range(map_side_size):
-        fire_square_list.append([])
-
-        for j in range(map_side_size):
-            x_pos += 95
-
-            fire_square = FireSquare(x_pos,y_pos,80,80,(0,0,0), i, j)
-            fire_square_list[i].append(fire_square)
-        
-        x_pos = 520
-        y_pos += 95
-    
-    is_setting_map = False
 
 main_menu()
