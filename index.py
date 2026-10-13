@@ -51,6 +51,8 @@ class FireFocusFinder:
 
     def find_focuses(self, cur_pos, fire_list):
         if cur_pos[0] == len(fire_list) and cur_pos[1] == 0: #verifica se passou do último elemento
+            if self.focus_list[len(self.focus_list)-1] == []:
+                self.focus_list.pop(len(self.focus_list)-1)
             return self.focus_list
         else:
             x = cur_pos[0]
@@ -61,7 +63,8 @@ class FireFocusFinder:
                 if self.focus_list == {}:
                     self.focus_list[0] = [[x, y]]
                 self.map_focus(cur_pos,fire_list)
-                self.focus_list[len(self.focus_list)] = []
+                if y < len(fire_list[x]) - 1 and x < len(fire_list):
+                    self.focus_list[len(self.focus_list)] = []
                 #self.last_passed_position = [x, y]
 
             #avança a posição de busca
