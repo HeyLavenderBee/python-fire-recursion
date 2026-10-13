@@ -35,12 +35,7 @@ class FireSquare:
         self.collidepoint = btn.collidepoint
 
     def hover(self):
-        # if self.is_fire:
-        #     self.hover_color = (255,0,0)
         pygame.mouse.set_cursor(pygame.cursors.ball)
-        # self.build_shape(self.x, self.y, self.width, self.height, self.hover_color)
-        # if self.is_fire:
-        #     screen.blit(fire_sprite, (self.x+10,self.y+10))
 
     def click(self):
         if self.is_fire == False:
@@ -52,6 +47,7 @@ class FireSquare:
         elif self.is_fire == True:
             self.is_fire = False
             self.fire_matrix[self.x_pos][self.y_pos] = 0
+            print(self.fire_matrix)
             self.color = (0,0,0)
             self.build_shape(self.x, self.y, self.width, self.height, self.color)
 

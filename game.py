@@ -4,6 +4,7 @@ from pygame_widgets.button import Button
 
 from index import FireFocusFinder
 from fire_square import FireSquare
+from focus_square import FocusSquare
 
 # ==============
 
@@ -18,6 +19,8 @@ title_font = pygame.font.SysFont("Arial", 30)
 text_font = pygame.font.SysFont("Arial", 22)
 
 is_setting_map = True
+
+focus_colors = ["#20baf7", "#f73220", "#e5e214", "#e514b4"]
 
 fire_matrix = [
     [0,0,0,0,0],
@@ -60,13 +63,48 @@ def clear_map():
 #função que roda a lógica de calcular focos
 def make_fire_array():
     global fire_matrix
-
-    print(fire_matrix)
+    global fire_square_list
 
     fire_focus_finder = FireFocusFinder()
     fire_focus_finder.find_focuses([0,0], fire_matrix)
     print(fire_focus_finder.focus_list)
-    print(fire_focus_finder.build_focus_map(fire_matrix))
+    draw_focus_map(fire_focus_finder.build_focus_map(fire_matrix))
+
+focus_square_list = []
+
+def draw_focus_map(focus_map):
+    x_pos = 480
+    y_pos = 95
+    width = 80
+    height = 80
+    pos_increment = 95
+
+    cover_bg = pygame.Rect(400,80,1000,1000) #para cobrir os quadrados desenhados antes
+    pygame.draw.rect(screen, "#E8E0E5", cover_bg)
+
+    width = 100-(map_side_size*5)
+    height = 100-(map_side_size*5)
+    x_pos = 480+map_side_size*4
+    pos_increment = width+10
+
+    map_width = (width*map_side_size)+((pos_increment-width)*(map_side_size+3))
+    map_rect = pygame.Rect(560, 80, map_width, map_width)
+    pygame.draw.rect(screen, "#C8B7AB", map_rect)
+
+    for i in range(map_side_size):
+        focus_square_list.append([])
+
+        for j in range(map_side_size):
+            x_pos += pos_increment
+
+            if focus_map[i][j] != 0:
+                focus_square = FocusSquare(x_pos, y_pos, width, height, focus_colors[focus_map[i][j]-1], i, j, screen, focus_map[i][j])
+            else:
+                focus_square = FocusSquare(x_pos, y_pos, width, height, (0,0,0), i, j, screen, 0)
+            focus_square_list[i].append(focus_square)
+
+        x_pos = 480 + map_side_size*4
+        y_pos += pos_increment
 
 def set_components(mx, my):
     global map_side_size
@@ -106,13 +144,15 @@ def change_map_size(new_size):
     fire_matrix = []
 
     line_array = []
-    fire_line_array = []
     for i in range(new_size):
         line_array.append((0,0,0))
-        fire_line_array.append(0)
     for i in range(new_size):
         map_squares_color[i] = line_array
-        fire_matrix.append(fire_line_array)
+
+    for i in range(new_size):
+        fire_matrix.append([])
+        for j in range(new_size):
+            fire_matrix[i].append(0)
 
 #chamado quando o tamanho do mapa é alterado, para redesenhar o mapa
 def set_first_map():
@@ -133,11 +173,6 @@ def set_first_map():
     cover_bg = pygame.Rect(400,80,1000,1000) #para cobrir os quadrados desenhados antes
     pygame.draw.rect(screen, "#E8E0E5", cover_bg)
 
-    if map_side_size > 6:
-        width = 60
-        height = 60
-        pos_increment = 70
-
     width = 100-(map_side_size*5)
     height = 100-(map_side_size*5)
     x_pos = 480+map_side_size*4
@@ -153,10 +188,10 @@ def set_first_map():
         for j in range(map_side_size):
             x_pos += pos_increment
 
-            fire_square = FireSquare(x_pos,y_pos,width,height,(0,0,0), i, j, screen, fire_matrix)
+            fire_square = FireSquare(x_pos, y_pos, width, height, (0,0,0), i, j, screen, fire_matrix)
             fire_square_list[i].append(fire_square)
         
-        x_pos = 480+map_side_size*4
+        x_pos = 480 + map_side_size*4
         y_pos += pos_increment
     
     is_setting_map = False

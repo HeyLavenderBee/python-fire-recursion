@@ -31,7 +31,7 @@ class FireFocusFinder:
             y = cur_pos[1]
 
             #caso o quadrado atual seja um fogo
-            if fire_list[x][y] == 1 and self.verificaLista([x,y]):
+            if fire_list[x][y] == 1 and self.verify_list([x,y]):
                 if self.focus_list == {}:
                     self.focus_list[0] = [[x, y]]
                 self.map_focus(cur_pos,fire_list)
@@ -47,11 +47,12 @@ class FireFocusFinder:
             
             self.find_focuses([x, y], fire_list)
 
+    #verifica vizinhos, também função recursiva
     def map_focus(self,cur_pos,fire_list):
         found_neighbors = 0
         x = cur_pos[0]
         y = cur_pos[1]
-        #print(self.focus_list)
+
         if self.focus_list != {}:
             if [x,y] not in self.focus_list[self.current_focus]: 
                 self.current_focus +=1
@@ -80,12 +81,10 @@ class FireFocusFinder:
                     self.focus_list[self.current_focus].append([x,y-1])
                     found_neighbors += 1
                     self.map_focus([x,y-1],fire_list)
-        #caso não tenha achado nenhum vizinho, cria seu próprio lar
-        # if found_neighbors == 0 and [x,y] not in self.focus_list[self.current_focus]:
-        #     self.focus_list[len(self.focus_list)] = [[x, y]]
+        
         return True
     
-    def verificaLista(self,valor):
+    def verify_list(self,valor):
         for i in self.focus_list:
             for j in self.focus_list[i]:
                 if j == valor:
@@ -94,7 +93,7 @@ class FireFocusFinder:
 
     def build_focus_map(self, fire_list):
         fire_map = []
-        #substituir fogos do fire_list (fire_array) por número de foco, retornando outra matriz
+        
         for i in range(len(fire_list)):
             fire_map.append([])
             for j in range(len(fire_list[i])):
@@ -102,7 +101,7 @@ class FireFocusFinder:
         for i in range(len(self.focus_list)-1):
             for j in self.focus_list[i]:
                 fire_map[j[0]][j[1]] = i + 1
-            print(fire_map[i])
+            # print(fire_map[i])
         return fire_map
 
 # ==== Rodando programa =====
