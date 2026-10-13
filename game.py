@@ -33,7 +33,10 @@ map_side_size = 3
 
 fire_sprite = pygame.image.load("img/fire-sprite.png")
 
-button = Button(screen, 500, 10, 60, 40, text="2x2", onClick=lambda: change_map_size(2))
+button_size2 = Button(screen, 500, 20, 60, 40, text="2x2", onClick=lambda: change_map_size(2))
+button_size3 = Button(screen, 580, 20, 60, 40, text="3x3", onClick=lambda: change_map_size(3))
+button_size4 = Button(screen, 660, 20, 60, 40, text="4x4", onClick=lambda: change_map_size(4))
+button_size5 = Button(screen, 740, 20, 60, 40, text="5x5", onClick=lambda: change_map_size(5))
 calculate_button = Button(screen, 30, 400, 150, 40, text="Calcular Focos", onClick=lambda: make_fire_array())
 
 click = False
@@ -48,13 +51,11 @@ def draw_title(text, font, color, surface, x, y):
 
 def make_fire_array():
     global fire_matrix
-    global map_squares_color
 
-    for i in range(map_side_size):
-        for j in range(map_side_size):
-            if map_squares_color[i][j] == (255,0,0):
-                fire_matrix[i][j] = 1
-    print(fire_matrix)
+    fire_focus_finder = FireFocusFinder()
+    fire_focus_finder.find_focuses([0,0], fire_matrix)
+    print(fire_focus_finder.focus_list)
+    print(fire_focus_finder.build_focus_map(fire_matrix))
 
 class FireSquare:
     is_fire = False
@@ -136,14 +137,6 @@ def on_fire_hover(mx,my):
                 fire_square_list[i][j].hover()
                 if click:
                     fire_square_list[i][j].click()
-
-"""
-[
-[<__main__.FireSquare object at 0x00000240AF43A900>, <__main__.FireSquare object at 0x00000240AF4CC2D0>, <__main__.FireSquare object at 0x00000240AF4CCF50>], 
-[<__main__.FireSquare object at 0x00000240AF4C5350>, <__main__.FireSquare object at 0x00000240AF4C5480>, <__main__.FireSquare object at 0x00000240AF4D0B90>], 
-[<__main__.FireSquare object at 0x00000240AF41AE00>, <__main__.FireSquare object at 0x00000240AF41B350>, <__main__.FireSquare object at 0x00000240AF480A50>]
-]
-"""
 
 def change_map_size(new_size):
     global is_setting_map
@@ -228,7 +221,7 @@ def set_first_map():
 
     fire_square_list = []
 
-    x_pos = 615
+    x_pos = 520
     y_pos = 95
 
     for i in range(map_side_size):
@@ -240,7 +233,7 @@ def set_first_map():
             fire_square = FireSquare(x_pos,y_pos,80,80,(0,0,0), i, j)
             fire_square_list[i].append(fire_square)
         
-        x_pos = 615
+        x_pos = 520
         y_pos += 95
     
     is_setting_map = False
