@@ -44,7 +44,7 @@ class FireSquare:
             self.color = (255,0,0)
             self.build_shape(self.x, self.y, self.width, self.height, self.color)
             self.screen.blit(fire_sprite, (self.x+self.width/2-25, self.y+self.height/2-25))
-        elif self.is_fire == True:
+        else:
             self.is_fire = False
             self.fire_matrix[self.x_pos][self.y_pos] = 0
             self.color = (0,0,0)

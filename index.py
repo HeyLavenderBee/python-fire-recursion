@@ -25,21 +25,24 @@ class FireFocusFinder:
 
     def find_focuses(self, cur_pos, fire_list):
         if cur_pos[0] == len(fire_list) and cur_pos[1] == 0: #verifica se passou do último elemento
-            if self.focus_list[len(self.focus_list)-1] == []:
+            if len(self.focus_list) > 0 and self.focus_list[len(self.focus_list)-1] == []:
                 self.focus_list.pop(len(self.focus_list)-1)
             return self.focus_list
         else:
             x = cur_pos[0]
             y = cur_pos[1]
 
+            #garante que o focus_list não tenha nada no início
+            if x == 0 and y == 0:
+                self.focus_list = {}
+
             #caso o quadrado atual seja um fogo
             if fire_list[x][y] == 1 and self.verify_list([x,y]):
                 if self.focus_list == {}:
                     self.focus_list[0] = [[x, y]]
                 self.map_focus(cur_pos,fire_list)
-                if y < len(fire_list[x]) - 1 and x < len(fire_list):
-                    self.focus_list[len(self.focus_list)] = []
-                #self.last_passed_position = [x, y]
+                #if y < len(fire_list[x]) - 1 and x < len(fire_list):
+                self.focus_list[len(self.focus_list)] = []
 
             #avança a posição de busca
             if y < len(fire_list[x]) - 1:
@@ -58,7 +61,7 @@ class FireFocusFinder:
 
         if self.focus_list != {}:
             if [x,y] not in self.focus_list[self.current_focus]: 
-                self.current_focus +=1
+                self.current_focus += 1
                 self.focus_list[self.current_focus].append([x,y])
             #vizinho de cima
             if x-1 > -1 and fire_list[x-1][y] == 1:
@@ -102,13 +105,16 @@ class FireFocusFinder:
             fire_map.append([])
             for j in range(len(fire_list[i])):
                 fire_map[i].append(0)
-        for i in range(len(self.focus_list)-1):
+        for i in range(len(self.focus_list)):
             for j in self.focus_list[i]:
                 fire_map[j[0]][j[1]] = i + 1
-            # print(fire_map[i])
+        
+        self.focus_list = {} #esvazia para a próxima vez que for chamar o find_focuses
+
         return fire_map
 
-# ==== Rodando programa =====
+
+# ==== Teste do programa =====
 
 """
 fire_focus_finder = FireFocusFinder()

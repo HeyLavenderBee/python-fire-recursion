@@ -1,4 +1,4 @@
-import pygame, sys, random, time, subprocess
+import pygame, sys, random, time, subprocess, copy
 import pygame_widgets
 from pygame_widgets.button import Button
 
@@ -6,6 +6,7 @@ from index import FireFocusFinder
 from fire_square import FireSquare
 from focus_square import FocusSquare
 from label import Label
+from color_rect import ColorRect
 import fire_map_control
 
 # ==============================================
@@ -35,26 +36,20 @@ fire_square_list = []
 
 focus_square_list = []
 
-focus_map = []
-
-map_side_size = 5
-
-button_size2 = Button(screen, 560, 20, 60, 40, text="2x2", onClick=lambda: change_map_size(2))
-button_size3 = Button(screen, 640, 20, 60, 40, text="3x3", onClick=lambda: change_map_size(3))
-button_size4 = Button(screen, 720, 20, 60, 40, text="4x4", onClick=lambda: change_map_size(4))
-button_size5 = Button(screen, 800, 20, 60, 40, text="5x5", onClick=lambda: change_map_size(5))
-button_size6 = Button(screen, 880, 20, 60, 40, text="6x6", onClick=lambda: change_map_size(6))
-button_size7 = Button(screen, 960, 20, 60, 40, text="7x7", onClick=lambda: change_map_size(7))
-button_size8 = Button(screen, 1040, 20, 60, 40, text="8x8", onClick=lambda: change_map_size(8))
-button_size9 = Button(screen, 1120, 20, 60, 40, text="9x9", onClick=lambda: change_map_size(9))
-button_size10 = Button(screen, 1200, 20, 60, 40, text="10x10", onClick=lambda: change_map_size(10))
+map_size_x = 5
+map_size_y = 5
 
 clear_button = Button(screen, 30, 120, 130, 40, text="Limpar mapa", onClick=lambda: clear_map())
 calculate_button = Button(screen, 30, 550, 150, 40, text="Calcular Focos", onClick=lambda: make_fire_array())
 
+#botões para mudar tamanho do mapa
+x_up_button = Button(screen, 690, 15, 40, 20, text="+", onClick=lambda: change_map_size(map_size_x+1, map_size_y))
+x_down_button = Button(screen, 690, 35, 40, 20, text="-", onClick=lambda: change_map_size(map_size_x-1, map_size_y))
+y_up_button = Button(screen, 930, 15, 40, 20, text="+", onClick=lambda: change_map_size(map_size_x, map_size_y+1))
+y_down_button = Button(screen, 930, 35, 40, 20, text="-", onClick=lambda: change_map_size(map_size_x, map_size_y-1))
+
 #limpa todos os fogos desenhados
 def clear_map():
-
     for i in range(len(fire_square_list)):
         for j in range(len(fire_square_list)):
             fire_square_list[i][j].clear()
@@ -62,58 +57,16 @@ def clear_map():
 #função que roda a lógica de calcular focos
 def make_fire_array():
     global fire_matrix
-    global focus_map
     global fire_square_list
 
     fire_focus_finder = FireFocusFinder()
-    fire_focus_finder.find_focuses([0,0], fire_matrix)
+    fire_focus_finder.find_focuses([0,0], copy.deepcopy(fire_matrix))
     focus_list = fire_focus_finder.focus_list
-    # print(fire_focus_finder.focus_list)
+    focus_map = fire_focus_finder.build_focus_map(copy.deepcopy(fire_matrix))
 
-    focus_map = fire_focus_finder.build_focus_map(fire_matrix)
-
-    fire_map_control.map_side_size = 7
-    print(fire_map_control.map_side_size)
-
-    subprocess.run(["py", "./focus_window.py", str(map_side_size), str(focus_map), str(focus_list)])
-
-def draw_focus_map(focus_map):
-    x_pos = 480
-    y_pos = 95
-    width = 80
-    height = 80
-    pos_increment = 95
-
-    cover_bg = pygame.Rect(400,80,1000,1000) #para cobrir os quadrados desenhados antes
-    pygame.draw.rect(screen, "#E8E0E5", cover_bg)
-
-    width = 100-(map_side_size*5)
-    height = 100-(map_side_size*5)
-    x_pos = 480+map_side_size*4
-    pos_increment = width+10
-
-    map_width = (width*map_side_size)+((pos_increment-width)*(map_side_size+3))
-    map_rect = pygame.Rect(560, 80, map_width, map_width)
-    pygame.draw.rect(screen, "#C8B7AB", map_rect)
-
-    for i in range(map_side_size):
-        focus_square_list.append([])
-
-        for j in range(map_side_size):
-            x_pos += pos_increment
-
-            if focus_map[i][j] != 0:
-                focus_square = FocusSquare(x_pos, y_pos, width, height, focus_colors[focus_map[i][j]-1], i, j, screen, focus_map[i][j])
-            else:
-                focus_square = FocusSquare(x_pos, y_pos, width, height, (0,0,0), i, j, screen, 0)
-            focus_square_list[i].append(focus_square)
-
-        x_pos = 480 + map_side_size*4
-        y_pos += pos_increment
+    subprocess.run(["py", "./focus_window.py", str(map_size_x), str(map_size_y), str(focus_map), str(focus_list)])
 
 def set_components(mx, my):
-    global map_side_size
-
     set_map(mx,my)
 
 def set_map(mx ,my):
@@ -128,76 +81,73 @@ def set_map(mx ,my):
 def on_fire_hover(mx,my):
     global fire_square_list
 
-    for i in range(len(fire_square_list)):
-        for j in range(len(fire_square_list)):
+    for i in range(map_size_y):
+        for j in range(map_size_x):
             if fire_square_list[i][j].collidepoint != 0 and fire_square_list[i][j].collidepoint((mx,my)):
                 fire_square_list[i][j].hover()
                 if click:
                     fire_square_list[i][j].click()
 
-def change_map_size(new_size):
+def change_map_size(new_size_x, new_size_y):
     global is_setting_map
-    global map_side_size
     global fire_matrix
+    global map_size_x
+    global map_size_y
+
+    #limita os tamanhos de 1 a 10
+    if new_size_x <= 0 or new_size_y <= 0 or new_size_x > 10 or new_size_y > 10:
+        return
 
     is_setting_map = True
 
-    map_side_size = new_size
+    print("new size x",new_size_x)
+    print("new y",new_size_y)
 
-    #refaz o map_squares_color de acordo com o novo tamanho do mapa
-    map_squares_color = {}
+    map_size_x = new_size_x
+    map_size_y = new_size_y
+
     fire_matrix = []
 
-    line_array = []
-    for i in range(new_size):
-        line_array.append((0,0,0))
-    for i in range(new_size):
-        map_squares_color[i] = line_array
-
-    for i in range(new_size):
+    for i in range(map_size_y):
         fire_matrix.append([])
-        for j in range(new_size):
+        for j in range(map_size_x):
             fire_matrix[i].append(0)
 
 #chamado quando o tamanho do mapa é alterado, para redesenhar o mapa
 def set_first_map():
     global is_setting_map
-    global map_squares_color
     global fire_square_list
 
-    change_map_size(map_side_size)
+    change_map_size(map_size_x, map_size_y)
 
     fire_square_list = []
-
-    x_pos = 480
-    y_pos = 95
-    width = 80
-    height = 80
-    pos_increment = 95
 
     cover_bg = pygame.Rect(400,80,1000,1000) #para cobrir os quadrados desenhados antes
     pygame.draw.rect(screen, "#E8E0E5", cover_bg)
 
-    width = 100-(map_side_size*5)
-    height = 100-(map_side_size*5)
-    x_pos = 480+map_side_size*4
-    pos_increment = width+10
+    width = 100-(map_size_x*5)
+    height = 100-(map_size_y*5)
+    x_pos = 476+map_size_x*4
+    y_pos = 95
+    pos_increment_x = width+5
+    pos_increment_y = height+5
     
-    map_width = (width*map_side_size)+((pos_increment-width)*(map_side_size+3))
-    map_rect = pygame.Rect(560, 80, map_width, map_width)
+    map_width = (width*map_size_x)+((pos_increment_x-width)*(map_size_x+4))
+    map_height = (height*map_size_y)+((pos_increment_y-height)*(map_size_y+4))
+    map_rect = pygame.Rect(560, 80, map_width, map_height)
     pygame.draw.rect(screen, "#C8B7AB", map_rect)
 
-    for i in range(map_side_size):
+    for i in range(map_size_y):
         fire_square_list.append([])
 
-        for j in range(map_side_size):
-            x_pos += pos_increment
+        for j in range(map_size_x):
+            x_pos += pos_increment_x
 
             fire_square = FireSquare(x_pos, y_pos, width, height, (0,0,0), i, j, screen, fire_matrix)
             fire_square_list[i].append(fire_square)
         
-        x_pos = 480 + map_side_size*4
-        y_pos += pos_increment
+        x_pos = 476 + map_size_x*4
+        y_pos += pos_increment_y
     
     is_setting_map = False
 
@@ -232,6 +182,15 @@ def main_menu():
         Label("Depois, clique no botão abaixo para", 21, (100,0,30), screen, 30, 260)
         Label("calcular os focos de incêndio com base", 21, (100,0,30), screen, 30, 290)
         Label("no mapa desenhado.", 21, (100,0,30), screen, 30, 320)
+
+        Label("Largura",22,(0,0,0),screen,550,25)
+        Label("Altura",22,(0,0,0),screen,800,25)
+
+        ColorRect(630, 15, 60, 40, "#8FE7D9", screen)
+        Label(str(map_size_x),22,(0,0,0),screen,650,20)
+
+        ColorRect(870, 15, 60, 40, "#8FE7D9", screen)
+        Label(str(map_size_y),22,(0,0,0),screen,890,20)
 
         Label("Feito completamente por humanos :D", 20, "#448AC7", screen, 30, 670)
 
