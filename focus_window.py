@@ -38,8 +38,7 @@ def draw_focus_map():
 
     map_width = (width*map_size_x)+((pos_increment_x-width)*(map_size_x+4))
     map_height = (height*map_size_y)+((pos_increment_y-height)*(map_size_y+4))
-    map_rect = pygame.Rect(560, 80, map_width, map_height)
-    map_rect = pygame.Rect(300, 80, map_width, map_width)
+    map_rect = pygame.Rect(300, 80, map_width, map_height)
     pygame.draw.rect(screen, "#C8B7AB", map_rect)
 
     for i in range(map_size_y):
