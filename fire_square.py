@@ -1,6 +1,8 @@
-import pygame
+import pygame, os, sys
 
-fire_sprite = pygame.image.load("img/fire-sprite.png")
+from resource_path import resource_path
+
+fire_sprite = pygame.image.load('img/fire-sprite.png')
 
 class FireSquare:
     is_fire = False

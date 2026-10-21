@@ -1,13 +1,14 @@
-import pygame, sys, random, time, subprocess, copy
+import pygame, os, subprocess, copy
 import pygame_widgets
 from pygame_widgets.button import Button
 
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
 from index import FireFocusFinder
 from fire_square import FireSquare
-from focus_square import FocusSquare
 from label import Label
 from color_rect import ColorRect
-import fire_map_control
+from resource_path import resource_path
 
 # ==============================================
 
@@ -20,8 +21,6 @@ running = True
 click = False
 
 is_setting_map = True
-
-focus_colors = ["#20baf7", "#f73220", "#e5e214", "#e514b4"]
 
 fire_matrix = [
     [0,0,0,0,0],
@@ -39,19 +38,19 @@ focus_square_list = []
 map_size_x = 5
 map_size_y = 5
 
-clear_button = Button(screen, 30, 120, 130, 40, text="Limpar mapa", onClick=lambda: clear_map())
-calculate_button = Button(screen, 30, 550, 150, 40, text="Calcular Focos", onClick=lambda: make_fire_array())
+clear_button = Button(screen, 30, 120, 130, 40, text="Limpar mapa", fontSize=20, inactiveColour="#80abd6", hoverColour="#5d8bb9", pressedColour="#3a6c9e", onClick=lambda: clear_map())
+calculate_button = Button(screen, 30, 550, 150, 40, text="Calcular Focos",fontSize=20, inactiveColour="#80abd6", hoverColour="#5d8bb9", pressedColour="#3a6c9e",  onClick=lambda: make_fire_array())
 
 #botões para mudar tamanho do mapa
-x_up_button = Button(screen, 690, 15, 40, 20, text="+", onClick=lambda: change_map_size(map_size_x+1, map_size_y))
-x_down_button = Button(screen, 690, 35, 40, 20, text="-", onClick=lambda: change_map_size(map_size_x-1, map_size_y))
-y_up_button = Button(screen, 930, 15, 40, 20, text="+", onClick=lambda: change_map_size(map_size_x, map_size_y+1))
-y_down_button = Button(screen, 930, 35, 40, 20, text="-", onClick=lambda: change_map_size(map_size_x, map_size_y-1))
+x_up_button = Button(screen, 690, 15, 40, 20, text="+", fontSize=22, inactiveColour="#80abd6", hoverColour="#5d8bb9", pressedColour="#3a6c9e", onClick=lambda: change_map_size(map_size_x+1, map_size_y))
+x_down_button = Button(screen, 690, 35, 40, 20, text="-", fontSize=22, inactiveColour="#80abd6", hoverColour="#5d8bb9", pressedColour="#3a6c9e", onClick=lambda: change_map_size(map_size_x-1, map_size_y))
+y_up_button = Button(screen, 930, 15, 40, 20, text="+", inactiveColour="#80abd6", hoverColour="#5d8bb9", pressedColour="#3a6c9e", onClick=lambda: change_map_size(map_size_x, map_size_y+1))
+y_down_button = Button(screen, 930, 35, 40, 20, text="-", inactiveColour="#80abd6", hoverColour="#5d8bb9", pressedColour="#3a6c9e", onClick=lambda: change_map_size(map_size_x, map_size_y-1))
 
 #limpa todos os fogos desenhados
 def clear_map():
-    for i in range(len(fire_square_list)):
-        for j in range(len(fire_square_list)):
+    for i in range(map_size_y):
+        for j in range(map_size_x):
             fire_square_list[i][j].clear()
 
 #função que roda a lógica de calcular focos
@@ -99,10 +98,7 @@ def change_map_size(new_size_x, new_size_y):
         return
 
     is_setting_map = True
-
-    print("new size x",new_size_x)
-    print("new y",new_size_y)
-
+    
     map_size_x = new_size_x
     map_size_y = new_size_y
 
@@ -153,14 +149,11 @@ def set_first_map():
 
 #a base da aplicação pygame, roda a 15fps
 def main_menu():
-    global btn1_color
     global click
 
     screen.fill("#E8E0E5")
 
     while True:
-        btn1_color = (0,0,0)
-
         click = False
 
         #ações do teclado e fechamento de janela
@@ -177,19 +170,21 @@ def main_menu():
 
         Label("Identificador de Focos de Incêndio", 30, (0,0,0), screen, 30, 20)
 
-        Label("Desenhe os quadrados no mapa ao", 21, (100,0,30), screen, 30, 200)
-        Label("lado para que possuam fogo ou não.", 21, (100,0,30), screen, 30, 230)
-        Label("Depois, clique no botão abaixo para", 21, (100,0,30), screen, 30, 260)
-        Label("calcular os focos de incêndio com base", 21, (100,0,30), screen, 30, 290)
-        Label("no mapa desenhado.", 21, (100,0,30), screen, 30, 320)
+        Label("Desenhe os quadrados no mapa ao", 21, "#1d2a81", screen, 30, 200)
+        Label("lado para que possuam fogo ou não.", 21, "#1d2a81", screen, 30, 230)
+        Label("Depois, clique no botão abaixo para", 21, "#1d2a81", screen, 30, 260)
+        Label("calcular os focos de incêndio com base", 21, "#1d2a81", screen, 30, 290)
+        Label("no mapa desenhado.", 21, "#1d2a81", screen, 30, 320)
+
+        Label("Cada quadrado possui 100m2", 21, "#990DBB", screen, 30, 400)
 
         Label("Largura",22,(0,0,0),screen,550,25)
         Label("Altura",22,(0,0,0),screen,800,25)
 
-        ColorRect(630, 15, 60, 40, "#8FE7D9", screen)
+        ColorRect(630, 15, 60, 40, "#BEE0E4", screen)
         Label(str(map_size_x),22,(0,0,0),screen,650,20)
 
-        ColorRect(870, 15, 60, 40, "#8FE7D9", screen)
+        ColorRect(870, 15, 60, 40, "#BEE0E4", screen)
         Label(str(map_size_y),22,(0,0,0),screen,890,20)
 
         Label("Feito completamente por humanos :D", 20, "#448AC7", screen, 30, 670)

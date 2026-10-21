@@ -13,12 +13,12 @@ import fire_map_control
 
 pygame.init()
 pygame.mouse.set_cursor(pygame.cursors.arrow)
-screen = pygame.display.set_mode((920, 720))
+screen = pygame.display.set_mode((1180, 720))
 clock = pygame.time.Clock()
 running = True
 click = False
 
-focus_colors = ["#20baf7", "#f73220", "#e5e214", "#e514b4"]
+focus_colors = ["#20baf7", "#f73220", "#e5e214", "#e514b4","#A305A6","#f89705","#01aa01"]
 
 map_size_x = int(sys.argv[1])
 map_size_y = int(sys.argv[2])
@@ -30,15 +30,15 @@ def draw_focus_map():
     pygame.draw.rect(screen, "#E8E0E5", cover_bg)
 
     width = 100-(map_size_x*5)
-    height = 100-(map_size_x*5)
-    x_pos = 215+map_size_x*4
-    y_pos = 95
+    height = 100-(map_size_y*5)
+    x_pos = 425+map_size_x*4
+    y_pos = 85
     pos_increment_x = width+5
     pos_increment_y = height+5
 
     map_width = (width*map_size_x)+((pos_increment_x-width)*(map_size_x+4))
     map_height = (height*map_size_y)+((pos_increment_y-height)*(map_size_y+4))
-    map_rect = pygame.Rect(300, 80, map_width, map_height)
+    map_rect = pygame.Rect(510, 70, map_width, map_height)
     pygame.draw.rect(screen, "#C8B7AB", map_rect)
 
     for i in range(map_size_y):
@@ -47,8 +47,8 @@ def draw_focus_map():
 
             color = "#9F5252"
 
-            if focus_map[i][j] > 4:
-                color = focus_colors[(focus_map[i][j]%4)-1]
+            if focus_map[i][j] > 7:
+                color = focus_colors[(focus_map[i][j]%7)-1]
             else:
                 color = focus_colors[focus_map[i][j]-1]
 
@@ -57,7 +57,7 @@ def draw_focus_map():
             else:
                 FocusSquare(x_pos, y_pos, width, height, (0,0,0), i, j, screen, 0)
 
-        x_pos = 215 + map_size_x*4
+        x_pos = 425 + map_size_x*4
         y_pos += pos_increment_y
 
 def draw_summary():
@@ -71,20 +71,23 @@ def draw_summary():
         Label("de incêndio.", 25, (0,0,0), screen, 30, 170)
     else:
         for i in range(len(focus_list)):
+            focus_size = len(focus_list[i])
+            focus_area = focus_size*100 #calcula tamanho do foco em metros quadrados
+
             if len(focus_list) > 4:
                 ColorRect(x_pos_rect, y_pos, 16, 16, focus_colors[i%4], screen)
             else:
                 ColorRect(x_pos_rect, y_pos, 18, 18, focus_colors[i], screen)
-            Label(str(i+1)+"("+str(len(focus_list[i]))+")", 22, (0,0,0), screen, x_pos_label, y_pos - 10)
+            Label(str(i+1)+"("+str(focus_area)+"m2)", 22, (0,0,0), screen, x_pos_label, y_pos - 10)
             y_pos += 26
             if i == 22:
                 y_pos = 100
-                x_pos_rect = 120
-                x_pos_label = 145
+                x_pos_rect = 185
+                x_pos_label = 210
             if i == 45:
                 y_pos = 100
-                x_pos_rect = 210
-                x_pos_label = 235
+                x_pos_rect = 335
+                x_pos_label = 360
             
 
 def focus_menu():

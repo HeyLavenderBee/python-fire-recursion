@@ -1,4 +1,9 @@
-## Identificador Focos de Incêndio
+
+<div align="center">
+<img src="img/fire-recursion-logo.svg">
+
+## Identificador de Focos de Incêndio
+</div>
 Este é um programa feito para a disciplina de Matemática para Computação do 2° semestre da Fatec.  
 Ele tem o objetivo de calcular focos de incêndio com base no input do usuário sobre um mapa que pode ser personalizado com os formatos de fogo que ele quiser.  
 
@@ -33,4 +38,5 @@ O projeto é simples, sendo composto de apenas suas telas, uma para o input de f
 
 <div align="center">
 <p>Feito completamente por humanos :)</p>
+<p>2026
 </div>

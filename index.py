@@ -41,7 +41,6 @@ class FireFocusFinder:
                 if self.focus_list == {}:
                     self.focus_list[0] = [[x, y]]
                 self.map_focus(cur_pos,fire_list)
-                #if y < len(fire_list[x]) - 1 and x < len(fire_list):
                 self.focus_list[len(self.focus_list)] = []
 
             #avança a posição de busca
@@ -127,4 +126,3 @@ print(fire_focus_finder.focus_list)
 print("Mapa com focos: ")
 print(fire_focus_finder.build_focus_map(fire_array))
 """
-
